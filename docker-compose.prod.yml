@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Infrastructure (Reusing from original compose)
@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: decp_password
       POSTGRES_DB: decp_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   mongodb:
     image: mongo:6.0
@@ -46,6 +46,7 @@ services:
       - SPRING_CLOUD_GATEWAY_ROUTES_2_URI=http://user-service:8082
       - SPRING_CLOUD_GATEWAY_ROUTES_3_URI=http://post-service:8083
       - SPRING_CLOUD_GATEWAY_ROUTES_4_URI=http://job-service:8084
+      - JWT_SECRET=${JWT_SECRET:-your-very-secure-and-long-secret-key-for-decp-project}
     depends_on:
       - auth-service
       - user-service
@@ -60,6 +61,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/decp_db
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - JWT_SECRET=${JWT_SECRET:-your-very-secure-and-long-secret-key-for-decp-project}
     depends_on:
       - postgres
       - rabbitmq

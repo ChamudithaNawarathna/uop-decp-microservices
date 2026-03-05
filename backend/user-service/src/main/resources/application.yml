@@ -5,9 +5,9 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/decp_db
-    username: decp_user
-    password: decp_password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/decp_db}
+    username: ${POSTGRES_USER:decp_user}
+    password: ${POSTGRES_PASSWORD:decp_password}
   jpa:
     hibernate:
       ddl-auto: update
