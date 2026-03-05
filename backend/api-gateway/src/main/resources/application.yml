@@ -104,6 +104,14 @@ spring:
           filters:
             - Jwt
 
+        # Mentorship Service: /api/mentorship/** -> localhost:8090/api/mentorship/**
+        - id: mentorship-service
+          uri: http://localhost:8090
+          predicates:
+            - Path=/api/mentorship/**
+          filters:
+            - Jwt
+
 management:
   endpoints:
     web:

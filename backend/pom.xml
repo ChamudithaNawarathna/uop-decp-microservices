@@ -35,6 +35,7 @@
         <module>research-service</module>
         <module>messaging-service</module>
         <module>analytics-service</module>
+        <module>mentorship-service</module>
     </modules>
 
 
