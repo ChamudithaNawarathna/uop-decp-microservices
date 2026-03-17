@@ -6,9 +6,9 @@ services:
     image: postgres:15-alpine
     container_name: decp-postgres-prod
     environment:
-      POSTGRES_USER: decp_user
-      POSTGRES_PASSWORD: decp_password
-      POSTGRES_DB: decp_db
+      POSTGRES_USER: ${POSTGRES_USER:-decp_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-decp_password}
+      POSTGRES_DB: ${POSTGRES_DB:-decp_db}
     ports:
       - "5433:5432"
 
@@ -16,8 +16,8 @@ services:
     image: mongo:6.0
     container_name: decp-mongodb-prod
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpassword}
     ports:
       - "27018:27017"
 
@@ -90,7 +90,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://root:rootpassword@mongodb:27017/decp_posts?authSource=admin
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI_PROD:-mongodb://root:rootpassword@mongodb:27017/decp_posts?authSource=admin}
       - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
       - mongodb

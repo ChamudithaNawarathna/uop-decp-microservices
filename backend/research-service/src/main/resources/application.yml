@@ -5,7 +5,7 @@ spring:
   application:
     name: research-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/decp_db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/decp_research_db}
     username: ${POSTGRES_USER:decp_user}
     password: ${POSTGRES_PASSWORD:decp_password}
   jpa:
