@@ -1,13 +1,15 @@
 package com.decp.post.service;
 
-import com.decp.post.model.Post;
-import com.decp.post.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.decp.post.model.Post;
+import com.decp.post.repository.PostRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +45,14 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         
-        if (!post.getLikedBy().contains(userId)) {
+        if (post.getLikedBy().contains(userId)) {
+            // Unlike: remove user from likedBy
+            post.getLikedBy().remove(userId);
+        } else {
+            // Like: add user to likedBy
             post.getLikedBy().add(userId);
-            return postRepository.save(post);
         }
-        return post;
+        return postRepository.save(post);
     }
 
     public Post addComment(String postId, Post.Comment comment) {

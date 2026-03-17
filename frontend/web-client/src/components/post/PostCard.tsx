@@ -14,17 +14,34 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
   const { user } = useAuth();
   const [showComments, setShowComments] = useState(false);
   const [liking, setLiking] = useState(false);
+  const [optimisticLiked, setOptimisticLiked] = useState<boolean | null>(null);
 
-  const isLiked = user ? post.likedBy.includes(String(user.id)) : false;
+  const isLiked =
+    optimisticLiked !== null
+      ? optimisticLiked
+      : user
+        ? post.likedBy.some((id) => String(id) === String(user.id))
+        : false;
 
   const handleLike = async () => {
     if (!user || liking) return;
+
+    // Optimistic update: show like immediately (Instagram style)
+    const newLikedState = !isLiked;
+    setOptimisticLiked(newLikedState);
     setLiking(true);
+
     try {
+      // Backend handles toggle: if already liked, it removes; if not liked, it adds
       const res = await postService.like(post.id, String(user.id));
+
+      // Keep optimistic state - heart stays colored
+      // Update parent so they get the updated like count
       onUpdate?.(res.data);
-    } catch {
-      /* ignore */
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+      // Revert on error only
+      setOptimisticLiked(null);
     }
     setLiking(false);
   };
