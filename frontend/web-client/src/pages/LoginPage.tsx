@@ -91,7 +91,7 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-gray-500">
             {isRegister
               ? "Join the Department Engagement & Career Platform"
-              : "Sign in to DECP"}
+              : "Sign in to PeraLink"}
           </p>
         </div>
 

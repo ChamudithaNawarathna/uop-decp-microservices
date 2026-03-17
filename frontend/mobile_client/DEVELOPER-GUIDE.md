@@ -28,16 +28,16 @@ The app is designed for scalability using a feature-based Clean Architecture app
 
 ## Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| Flutter SDK | Cross-platform mobile framework |
-| Dart | Programming language |
-| Riverpod | State management |
-| Dio | HTTP networking |
-| GoRouter | Navigation |
-| Freezed / Json Serializable | Models |
-| Flutter Secure Storage | JWT storage |
-| STOMP Dart Client | WebSocket messaging |
+| Technology                  | Purpose                         |
+| --------------------------- | ------------------------------- |
+| Flutter SDK                 | Cross-platform mobile framework |
+| Dart                        | Programming language            |
+| Riverpod                    | State management                |
+| Dio                         | HTTP networking                 |
+| GoRouter                    | Navigation                      |
+| Freezed / Json Serializable | Models                          |
+| Flutter Secure Storage      | JWT storage                     |
+| STOMP Dart Client           | WebSocket messaging             |
 
 ---
 
@@ -117,6 +117,7 @@ feature_name/
 The app uses **Dio** as the HTTP client.
 
 Responsibilities:
+
 - Base API configuration
 - Request interceptors
 - JWT authentication headers
@@ -135,6 +136,7 @@ Responsibilities:
 Riverpod is used for managing application state.
 
 Types used:
+
 - `StateNotifierProvider`
 - `FutureProvider`
 - `StreamProvider`
@@ -186,6 +188,7 @@ All services are accessed through gateway routes:
 Messaging uses **STOMP over WebSocket**.
 
 Features:
+
 - Real-time messages
 - Typing indicators
 - Read receipts
@@ -206,17 +209,20 @@ Features:
 Users have one of three roles:
 
 ### Student
+
 - Apply to jobs
 - Request mentorship
 - Participate in events
 
 ### Alumni
+
 - Create jobs
 - Host events
 - Upload research
 - Accept mentorship requests
 
 ### Admin
+
 - Access analytics
 - Platform moderation
 
@@ -235,12 +241,12 @@ Users have one of three roles:
 
 All API errors follow a unified response format. The app maps API errors into domain exceptions.
 
-| Error Type | Description |
-|---|---|
-| Network error | No connectivity or timeout |
-| Authentication error | Invalid or expired token |
-| Validation error | Bad request input |
-| Server error | Internal backend failure |
+| Error Type           | Description                |
+| -------------------- | -------------------------- |
+| Network error        | No connectivity or timeout |
+| Authentication error | Invalid or expired token   |
+| Validation error     | Bad request input          |
+| Server error         | Internal backend failure   |
 
 UI should display friendly messages while logging detailed errors for debugging.
 
@@ -249,11 +255,13 @@ UI should display friendly messages while logging detailed errors for debugging.
 ## Testing Strategy
 
 **Types of tests used:**
+
 - Unit Tests
 - Widget Tests
 - Integration Tests
 
 **Focus areas:**
+
 - Repository logic
 - Use cases
 - State management controllers
@@ -263,6 +271,7 @@ UI should display friendly messages while logging detailed errors for debugging.
 ## Code Conventions
 
 **Guidelines:**
+
 - Follow Dart formatting standards
 - Keep widgets small and reusable
 - Avoid business logic inside UI widgets
@@ -271,11 +280,11 @@ UI should display friendly messages while logging detailed errors for debugging.
 
 **Naming conventions:**
 
-| Convention | Usage |
-|---|---|
-| `snake_case` | Files |
-| `PascalCase` | Classes |
-| `camelCase` | Variables and methods |
+| Convention   | Usage                 |
+| ------------ | --------------------- |
+| `snake_case` | Files                 |
+| `PascalCase` | Classes               |
+| `camelCase`  | Variables and methods |
 
 ---
 
