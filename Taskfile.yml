@@ -31,9 +31,26 @@ tasks:
       - task: run:all
 
   stop:
-    desc: Stop all running services and infrastructure
+    desc: Stop all Java microservices and Docker infrastructure
     cmds:
+      - task: stop:services
       - task: stop:infra
+
+  # ──────────────────────────────────────────
+  # Infrastructure
+  # ──────────────────────────────────────────
+
+  # ──────────────────────────────────────────
+  # Stop Services
+  # ──────────────────────────────────────────
+
+  stop:services:
+    desc: Stop all running Java microservices
+    cmds:
+      - cmd: powershell -Command "Get-Process java -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue ; Write-Host 'All Java processes stopped'"
+        platforms: [windows]
+      - cmd: pkill -f 'java.*jar' || true
+        platforms: [linux, darwin]
 
   # ──────────────────────────────────────────
   # Infrastructure

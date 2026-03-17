@@ -2,10 +2,7 @@ package com.decp.research.service;
 
 import com.decp.research.config.ResearchEventPublisher;
 import com.decp.research.dto.*;
-import com.decp.research.model.Research;
-import com.decp.research.model.ResearchCategory;
-import com.decp.research.model.ResearchTag;
-import com.decp.research.model.ResearchVersion;
+import com.decp.research.model.*;
 import com.decp.research.repository.ResearchRepository;
 import com.decp.research.repository.ResearchVersionRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +20,7 @@ public class ResearchService {
     private final ResearchRepository researchRepository;
     private final ResearchVersionRepository versionRepository;
     private final ResearchEventPublisher eventPublisher;
+    private final CollaborationService collaborationService;
 
     @Transactional
     public ResearchResponse uploadResearch(ResearchRequest request, Long userId, String userName) {
@@ -39,6 +37,14 @@ public class ResearchService {
                 .build();
 
         Research saved = researchRepository.save(research);
+
+        // Add creator as project owner
+        collaborationService.addProjectMember(
+                saved.getId(),
+                userId,
+                userName,
+                ProjectMember.ProjectRole.OWNER
+        );
 
         // Create initial version
         if (saved.getDocumentUrl() != null) {
@@ -97,6 +103,7 @@ public class ResearchService {
         return toResponse(updated);
     }
 
+    @Transactional
     public void deleteResearch(Long id, String userName, String userRole) {
         Research research = researchRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Research not found with id: " + id));
@@ -105,6 +112,9 @@ public class ResearchService {
             throw new RuntimeException("Only the author or an admin can delete this research");
         }
 
+        // Clean up collaboration data
+        collaborationService.deleteProjectCollaborationData(id);
+        
         researchRepository.delete(research);
     }
 
