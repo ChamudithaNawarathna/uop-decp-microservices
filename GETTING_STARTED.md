@@ -59,15 +59,62 @@ Edit `.env` if you need to change any default credentials. The defaults work out
 ```bash
 task install:frontend
 ```
+
 > **TROUBLESHOOT**
 >
 > If the task command is not recognized, you may need to add the Task installation directory to your PATH environment variable
 
-### 4. Start everything with a single command
+### 4. Fix `JAVA_HOME` in `Taskfile.yml`
+
+Open `Taskfile.yml` and update the `JAVA_HOME` variable to match where JDK 17 is installed on your machine:
+
+```yaml
+vars:
+  JAVA_HOME: C:\Path\To\Your\jdk-17
+```
+
+To find your JDK path:
+
+```powershell
+# Windows
+where java
+
+# macOS / Linux
+which java
+```
+
+### 5. Start infrastructure
 
 > **IMPORTANT**
 >
-> Make sure the Docker engine is running before executing this command.  
+> Make sure the Docker engine is running before executing this command.
+
+```bash
+task infra
+```
+
+### 6. Initialize databases
+
+The PostgreSQL container only auto-creates `decp_db`. Run this script **once** to create all service databases:
+
+```powershell
+powershell -File scripts/init-databases.ps1
+```
+
+You should see `[OK]` printed for each of the 6 databases (`decp_user_db`, `decp_job_db`, `decp_event_db`, `decp_research_db`, `decp_mentorship_db`, `decp_analytics_db`).
+
+> **NOTE**
+>
+> This step is only needed on first setup. The databases persist in the Docker volume across restarts.
+
+### 7. Build and run everything
+
+```bash
+task build:backend
+task run:all
+```
+
+Or use the single command that does steps 5–7 together (skip steps 5 and 6 if you haven't run the init script yet — run infra first, then the init script, then this):
 
 ```bash
 task start
@@ -224,12 +271,7 @@ If a port (e.g. 5432 for PostgreSQL) is already in use by a local installation, 
 
 ### Java version issues
 
-The Taskfile sets `JAVA_HOME` to `C:\Program Files\Java\jdk-17`. If your JDK is installed elsewhere, update the `JAVA_HOME` variable in `Taskfile.yml`:
-
-```yaml
-vars:
-  JAVA_HOME: /path/to/your/jdk-17
-```
+The Taskfile has a hardcoded `JAVA_HOME` path that will differ on every machine. Update it in `Taskfile.yml` to match your local JDK 17 installation (see step 4 above).
 
 ### Build fails
 
