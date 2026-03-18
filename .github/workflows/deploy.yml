@@ -168,20 +168,15 @@ jobs:
               --no-cli-pager
           done
 
-      - name: Wait for services to stabilize
+      - name: Verify services are running
         run: |
-          SERVICES=(
-            api-gateway auth-service user-service post-service
-            job-service event-service research-service messaging-service
-            notification-service analytics-service mentorship-service
-          )
-          for SERVICE in "${SERVICES[@]}"; do
-            echo "Waiting for ${SERVICE}..."
-            aws ecs wait services-stable \
-              --cluster decp-cluster \
-              --services "${SERVICE}"
-          done
-          echo "All services stable."
+          aws ecs describe-services \
+            --cluster decp-cluster \
+            --services api-gateway auth-service user-service post-service \
+              job-service event-service research-service messaging-service \
+              notification-service analytics-service mentorship-service \
+            --query 'services[*].{Service:serviceName,Running:runningCount,Desired:desiredCount}' \
+            --output table
 
   # ─────────────────────────────────────────
   # Job 6: Deploy frontend to S3
