@@ -51,7 +51,9 @@ const SERVICES: ServiceDefinition[] = [
     cpu: 256,
     memoryMiB: 512,
     isPublic: false,
-    getEnv: () => ({}),
+    getEnv: () => ({
+      USER_SERVICE_URL: 'http://user-service.decp.local:8082',
+    }),
     getSecrets: (s) => ({
       JWT_SECRET: ecs.Secret.fromSecretsManager(s, 'JWT_SECRET'),
     }),

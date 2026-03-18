@@ -5,6 +5,10 @@ spring:
   application:
     name: auth-service
 
+user:
+  service:
+    url: ${USER_SERVICE_URL:http://localhost:8082}
+
 jwt:
   secret: ${JWT_SECRET:your-very-secure-and-long-secret-key-for-decp-project}
   expiration: ${JWT_EXPIRATION:86400000}
