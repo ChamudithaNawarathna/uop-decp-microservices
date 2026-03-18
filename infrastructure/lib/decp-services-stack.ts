@@ -27,7 +27,20 @@ const SERVICES: ServiceDefinition[] = [
     cpu: 512,
     memoryMiB: 1024,
     isPublic: true,
-    getEnv: (_host, cors) => ({ CORS_ALLOWED_ORIGIN: cors }),
+    getEnv: (_host, cors) => ({
+      CORS_ALLOWED_ORIGIN: cors,
+      AUTH_SERVICE_URL:         'http://auth-service.decp.local:8081',
+      USER_SERVICE_URL:         'http://user-service.decp.local:8082',
+      POST_SERVICE_URL:         'http://post-service.decp.local:8083',
+      JOB_SERVICE_URL:          'http://job-service.decp.local:8084',
+      EVENT_SERVICE_URL:        'http://event-service.decp.local:8085',
+      RESEARCH_SERVICE_URL:     'http://research-service.decp.local:8086',
+      MESSAGING_SERVICE_URL:    'http://messaging-service.decp.local:8087',
+      MESSAGING_SERVICE_WS_URL: 'ws://messaging-service.decp.local:8087',
+      NOTIFICATION_SERVICE_URL: 'http://notification-service.decp.local:8088',
+      ANALYTICS_SERVICE_URL:    'http://analytics-service.decp.local:8089',
+      MENTORSHIP_SERVICE_URL:   'http://mentorship-service.decp.local:8090',
+    }),
     getSecrets: (s) => ({
       JWT_SECRET: ecs.Secret.fromSecretsManager(s, 'JWT_SECRET'),
     }),
@@ -233,6 +246,10 @@ export class DecpServicesStack extends cdk.Stack {
         maxHealthyPercent: 100,
         circuitBreaker: { enable: false, rollback: false },
         healthCheckGracePeriod: cdk.Duration.seconds(60),
+        cloudMapOptions: {
+          name: svc.name,
+          cloudMapNamespace: infra.dnsNamespace,
+        },
       });
 
       if (svc.isPublic) {

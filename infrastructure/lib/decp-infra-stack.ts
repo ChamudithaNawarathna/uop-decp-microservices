@@ -6,6 +6,7 @@ import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as servicediscovery from 'aws-cdk-lib/aws-servicediscovery';
 import { Construct } from 'constructs';
 
 export const SERVICE_NAMES = [
@@ -26,6 +27,7 @@ export class DecpInfraStack extends cdk.Stack {
   // Exported for use by DecpServicesStack
   public readonly vpc: ec2.Vpc;
   public readonly cluster: ecs.Cluster;
+  public readonly dnsNamespace: servicediscovery.PrivateDnsNamespace;
   public readonly albListener: elbv2.ApplicationListener;
   public readonly alb: elbv2.ApplicationLoadBalancer;
   public readonly servicesSg: ec2.SecurityGroup;
@@ -171,6 +173,12 @@ export class DecpInfraStack extends cdk.Stack {
       vpc: this.vpc,
       clusterName: 'decp-cluster',
       containerInsightsV2: ecs.ContainerInsights.ENABLED,
+    });
+
+    // ── Cloud Map (Service Discovery) ─────
+    this.dnsNamespace = new servicediscovery.PrivateDnsNamespace(this, 'DecpNamespace', {
+      name: 'decp.local',
+      vpc: this.vpc,
     });
 
     // ── CloudWatch Log Group ──────────────
