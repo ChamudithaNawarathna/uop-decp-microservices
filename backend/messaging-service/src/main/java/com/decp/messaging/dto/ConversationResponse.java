@@ -17,6 +17,8 @@ public class ConversationResponse {
     private String id;
     private List<Long> participants;
     private List<String> participantNames;
+    private String groupName;
+    private boolean group;
     private String lastMessage;
     private LocalDateTime lastMessageAt;
     private LocalDateTime createdAt;

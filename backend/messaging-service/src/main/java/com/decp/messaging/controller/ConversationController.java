@@ -1,5 +1,6 @@
 package com.decp.messaging.controller;
 
+import com.decp.messaging.dto.AddParticipantsRequest;
 import com.decp.messaging.dto.ConversationRequest;
 import com.decp.messaging.dto.ConversationResponse;
 import com.decp.messaging.dto.MessageResponse;
@@ -61,6 +62,14 @@ public class ConversationController {
             @RequestHeader(value = "X-User-Id", required = false, defaultValue = "0") Long userId) {
         messagingService.markMessagesAsRead(id, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/participants")
+    public ResponseEntity<ConversationResponse> addParticipants(
+            @PathVariable String id,
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "0") Long userId,
+            @RequestBody AddParticipantsRequest request) {
+        return ResponseEntity.ok(messagingService.addParticipants(id, userId, request.getParticipantIds(), request.getParticipantNames()));
     }
 
     @DeleteMapping("/{id}")

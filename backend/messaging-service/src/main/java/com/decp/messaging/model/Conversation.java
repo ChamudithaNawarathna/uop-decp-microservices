@@ -27,6 +27,10 @@ public class Conversation {
 
     private List<String> participantNames;
 
+    private String groupName;
+
+    private boolean group;
+
     private String lastMessage;
 
     private LocalDateTime lastMessageAt;

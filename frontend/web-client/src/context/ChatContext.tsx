@@ -32,6 +32,7 @@ interface ChatContextType {
   startConversation: (
     participantIds: number[],
     participantNames: string[],
+    groupName?: string,
   ) => Promise<ConversationResponse>;
 }
 
@@ -244,8 +245,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [connected, currentConversation, user],
   );
 
-  const startConversation = useCallback(async (participantIds: number[], participantNames: string[]) => {
-    const res = await chatService.createConversation(participantIds, participantNames);
+  const startConversation = useCallback(async (participantIds: number[], participantNames: string[], groupName?: string) => {
+    const res = await chatService.createConversation(participantIds, participantNames, groupName);
     setConversations((prev) => [res.data, ...prev]);
     return res.data;
   }, []);

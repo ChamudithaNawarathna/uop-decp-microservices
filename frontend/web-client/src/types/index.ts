@@ -207,6 +207,8 @@ export interface ConversationResponse {
   id: string;
   participants: number[];
   participantNames: string[];
+  groupName?: string;
+  group?: boolean;
   lastMessage: string;
   lastMessageAt: string;
   createdAt: string;

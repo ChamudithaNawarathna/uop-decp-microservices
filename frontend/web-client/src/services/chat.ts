@@ -7,8 +7,11 @@ export const chatService = {
   getConversation: (id: string) =>
     api.get<ConversationResponse>(`/api/conversations/${id}`),
 
-  createConversation: (participantIds: number[], participantNames: string[]) =>
-    api.post<ConversationResponse>("/api/conversations", { participantIds, participantNames }),
+  createConversation: (participantIds: number[], participantNames: string[], groupName?: string) =>
+    api.post<ConversationResponse>("/api/conversations", { participantIds, participantNames, groupName }),
+
+  addParticipants: (conversationId: string, participantIds: number[], participantNames: string[]) =>
+    api.put<ConversationResponse>(`/api/conversations/${conversationId}/participants`, { participantIds, participantNames }),
 
   getMessages: (conversationId: string, page = 0, size = 50) =>
     api.get<Page<MessageResponse>>(

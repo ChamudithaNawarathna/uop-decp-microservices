@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useChat } from "../context/ChatContext";
 import ConversationItem from "../components/chat/ConversationItem";
 import MessageBubble from "../components/chat/MessageBubble";
-import UserSearchModal from "../components/chat/UserSearchModal";
+import NewConversationModal from "../components/chat/NewConversationModal";
 import type { User } from "../types";
 
 export default function ChatPage() {
@@ -52,31 +52,36 @@ export default function ChatPage() {
     setInput("");
   };
 
-  const handleStartNew = async (selectedUser: User) => {
+  const handleStartNew = async (participants: User[], groupName?: string) => {
     if (!user) return;
 
-    // Check if conversation already exists
-    const existingConv = conversations.find(
-      (conv) =>
-        conv.participants.length === 2 &&
-        conv.participants.includes(user.id) &&
-        conv.participants.includes(selectedUser.id),
-    );
+    const isGroup = participants.length > 1;
 
-    if (existingConv) {
-      await selectConversation(existingConv);
-      setShowUserSearch(false);
-      return;
+    // For 1:1 chats, check if conversation already exists
+    if (!isGroup) {
+      const other = participants[0];
+      const existingConv = conversations.find(
+        (conv) =>
+          !conv.group &&
+          conv.participants.length === 2 &&
+          conv.participants.map(String).includes(String(user.id)) &&
+          conv.participants.map(String).includes(String(other.id)),
+      );
+      if (existingConv) {
+        await selectConversation(existingConv);
+        setShowUserSearch(false);
+        return;
+      }
     }
 
     setStartingChat(true);
     try {
-      const conv = await startConversation(
-        [user.id, selectedUser.id],
-        [user.fullName, selectedUser.fullName],
-      );
+      const allIds = [user.id, ...participants.map((p) => p.id)];
+      const allNames = [user.fullName, ...participants.map((p) => p.fullName)];
+      const conv = await startConversation(allIds, allNames, groupName);
       await selectConversation(conv);
       await loadConversations();
+      setShowUserSearch(false);
     } catch (err) {
       console.error("Failed to start conversation:", err);
     } finally {
@@ -129,13 +134,26 @@ export default function ChatPage() {
           <>
             {/* Chat Header */}
             <div className="border-b subtle-border bg-white/60 px-6 py-4 dark:bg-white/5">
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                {(currentConversation.participantNames || [])
-                  .filter(
-                    (_, i) => String(currentConversation.participants?.[i]) !== String(user.id),
-                  )
-                  .join(", ") || "Chat"}
-              </h3>
+              {currentConversation.group ? (
+                <>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {currentConversation.groupName || "Group Chat"}
+                  </h3>
+                  <p className="text-xs ink-muted">
+                    {currentConversation.participants.length} members
+                  </p>
+                </>
+              ) : (
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  {(currentConversation.participantNames || [])
+                    .filter(
+                      (_, i) =>
+                        i < (currentConversation.participants?.length || 0) &&
+                        String(currentConversation.participants?.[i]) !== String(user.id),
+                    )
+                    .join(", ") || "Chat"}
+                </h3>
+              )}
             </div>
 
             {/* Messages */}
@@ -146,6 +164,7 @@ export default function ChatPage() {
                     key={msg.id}
                     message={msg}
                     isOwn={String(msg.senderId) === String(user.id)}
+                    showSenderName={currentConversation.group}
                   />
                 ))}
                 <div ref={messagesEndRef} />
@@ -199,11 +218,10 @@ export default function ChatPage() {
         )}
       </div>
 
-      <UserSearchModal
+      <NewConversationModal
         open={showUserSearch}
         onClose={() => setShowUserSearch(false)}
-        onSelectUser={handleStartNew}
-        title="Start New Conversation"
+        onStart={handleStartNew}
         loading={startingChat}
       />
     </div>

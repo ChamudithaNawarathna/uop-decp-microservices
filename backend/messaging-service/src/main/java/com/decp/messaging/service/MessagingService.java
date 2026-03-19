@@ -32,10 +32,15 @@ public class MessagingService {
             participantNames.add(currentUserName);
         }
 
+        boolean isGroup = participants.size() > 2 ||
+                (request.getGroupName() != null && !request.getGroupName().isBlank());
+
         LocalDateTime now = LocalDateTime.now();
         Conversation conversation = Conversation.builder()
                 .participants(participants)
                 .participantNames(participantNames)
+                .groupName(isGroup ? request.getGroupName() : null)
+                .group(isGroup)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -168,12 +173,33 @@ public class MessagingService {
         return conversation;
     }
 
+    public ConversationResponse addParticipants(String conversationId, Long currentUserId,
+                                                List<Long> newParticipantIds, List<String> newParticipantNames) {
+        Conversation conversation = findConversationAndVerifyAccess(conversationId, currentUserId);
+        List<Long> participants = new java.util.ArrayList<>(conversation.getParticipants());
+        List<String> participantNames = new java.util.ArrayList<>(conversation.getParticipantNames());
+        for (int i = 0; i < newParticipantIds.size(); i++) {
+            Long pid = newParticipantIds.get(i);
+            if (!participants.contains(pid)) {
+                participants.add(pid);
+                participantNames.add(i < newParticipantNames.size() ? newParticipantNames.get(i) : "Unknown");
+            }
+        }
+        conversation.setParticipants(participants);
+        conversation.setParticipantNames(participantNames);
+        conversation.setGroup(participants.size() > 2);
+        conversationRepository.save(conversation);
+        return toConversationResponse(conversation, currentUserId);
+    }
+
     private ConversationResponse toConversationResponse(Conversation conversation, Long userId) {
         long unreadCount = messageRepository.countByConversationIdAndReadByNotContaining(conversation.getId(), userId);
         return ConversationResponse.builder()
                 .id(conversation.getId())
                 .participants(conversation.getParticipants() != null ? conversation.getParticipants() : java.util.Collections.emptyList())
                 .participantNames(conversation.getParticipantNames() != null ? conversation.getParticipantNames() : java.util.Collections.emptyList())
+                .groupName(conversation.getGroupName())
+                .group(conversation.isGroup())
                 .lastMessage(conversation.getLastMessage())
                 .lastMessageAt(conversation.getLastMessageAt())
                 .createdAt(conversation.getCreatedAt())
