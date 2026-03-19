@@ -480,7 +480,7 @@ function MyProfileTab() {
     expertise: [],
     interests: [],
     bio: "",
-    availability: "PART_TIME" as Availability,
+    availability: "AVAILABLE" as Availability,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   const [saving, setSaving] = useState(false);
@@ -621,9 +621,10 @@ function MyProfileTab() {
             }
             className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:ring-primary-500"
           >
-            <option value="FULL_TIME">Full Time</option>
-            <option value="PART_TIME">Part Time</option>
-            <option value="WEEKENDS_ONLY">Weekends Only</option>
+            <option value="HIGHLY_AVAILABLE">Highly Available</option>
+            <option value="AVAILABLE">Available</option>
+            <option value="LIMITED">Limited</option>
+            <option value="NOT_AVAILABLE">Not Available</option>
           </select>
           <input
             type="url"
