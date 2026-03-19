@@ -70,17 +70,24 @@ function DiscoverTab() {
   const [noProfile, setNoProfile] = useState(false);
   const [expertise, setExpertise] = useState("");
 
+  const isStudent = user?.role === "STUDENT";
+
   const fetchMatches = useCallback(async () => {
     try {
       setLoading(true);
       setNoProfile(false);
-      // Check profile exists first
-      await mentorshipService.getMyProfile();
-      const params = expertise ? { expertise } : undefined;
-      const res = params
-        ? await mentorshipService.getAdvancedMatches(params)
-        : await mentorshipService.getMatches();
-      setMatches(res.data);
+      if (isStudent) {
+        const res = await mentorshipService.getMentors();
+        setMatches(res.data.map((p) => ({ userId: p.userId, userName: p.userName, profile: p, compatibilityScore: 0, commonInterests: [], distanceScore: 0 })));
+      } else {
+        // Check profile exists first
+        await mentorshipService.getMyProfile();
+        const params = expertise ? { expertise } : undefined;
+        const res = params
+          ? await mentorshipService.getAdvancedMatches(params)
+          : await mentorshipService.getMatches();
+        setMatches(res.data);
+      }
     } catch (err: any) {
       const status = err?.response?.status;
       if (status === 404 || status === 500) {
@@ -91,7 +98,7 @@ function DiscoverTab() {
     } finally {
       setLoading(false);
     }
-  }, [expertise]);
+  }, [expertise, isStudent]);
 
   useEffect(() => {
     fetchMatches();
