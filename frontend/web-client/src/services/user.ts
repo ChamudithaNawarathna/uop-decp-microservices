@@ -7,5 +7,8 @@ export const userService = {
   searchByUsername: (username: string) =>
     api.get<User>("/api/users/search", { params: { username } }),
 
+  searchUsers: (q: string) =>
+    api.get<User[]>("/api/users/search/query", { params: { q } }),
+
   getAlumni: () => api.get<User[]>("/api/users/alumni"),
 };

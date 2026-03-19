@@ -71,6 +71,13 @@ public class UserService {
         return dto;
     }
 
+    public List<UserDTO> searchUsers(String query) {
+        return userRepository.findTop20ByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(query, query)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<UserDTO> getAlumni() {
         return userRepository.findByRole(UserRole.ALUMNI).stream()
                 .map(this::mapToDTO)

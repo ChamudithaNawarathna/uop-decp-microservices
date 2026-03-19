@@ -31,6 +31,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
+    @GetMapping("/search/query")
+    public ResponseEntity<List<UserDTO>> searchUsers(@RequestParam String q) {
+        return ResponseEntity.ok(userService.searchUsers(q));
+    }
+
     @GetMapping("/internal/{username}")
     public ResponseEntity<com.decp.user.dto.UserAuthDTO> getUserAuthByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserAuthByUsername(username));

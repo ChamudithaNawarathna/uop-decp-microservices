@@ -46,10 +46,9 @@ export default function NewConversationModal({
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await userService.searchByUsername(query.trim());
-        const users = Array.isArray(res.data) ? res.data : [res.data];
-        setResults(users);
-        if (users.length === 0) setError("No users found");
+        const res = await userService.searchUsers(query.trim());
+        setResults(res.data);
+        if (res.data.length === 0) setError("No users found");
       } catch {
         setResults([]);
         setError("No users found");
@@ -123,7 +122,7 @@ export default function NewConversationModal({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by username..."
+            placeholder="Search by name or username..."
             className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
             autoFocus
           />
