@@ -67,18 +67,27 @@ function DiscoverTab() {
   const [matches, setMatches] = useState<MentorshipMatchDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [noProfile, setNoProfile] = useState(false);
   const [expertise, setExpertise] = useState("");
 
   const fetchMatches = useCallback(async () => {
     try {
       setLoading(true);
+      setNoProfile(false);
+      // Check profile exists first
+      await mentorshipService.getMyProfile();
       const params = expertise ? { expertise } : undefined;
       const res = params
         ? await mentorshipService.getAdvancedMatches(params)
         : await mentorshipService.getMatches();
       setMatches(res.data);
-    } catch {
-      setError("Failed to load mentors");
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 404 || status === 500) {
+        setNoProfile(true);
+      } else {
+        setError("Failed to load mentors");
+      }
     } finally {
       setLoading(false);
     }
@@ -92,6 +101,22 @@ function DiscoverTab() {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={error} onClose={() => setError("")} />;
+
+  if (noProfile) {
+    const isStudent = user?.role === "STUDENT";
+    return (
+      <div className="glass-panel rounded-2xl p-8 text-center">
+        <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          Mentorship profile required
+        </p>
+        <p className="ink-muted text-sm">
+          {isStudent
+            ? "Only Alumni and Faculty can create mentorship profiles. As a student, you can browse mentors once you are matched with one."
+            : "Go to the \"My Profile\" tab to create your mentorship profile first, then you can discover matches."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
