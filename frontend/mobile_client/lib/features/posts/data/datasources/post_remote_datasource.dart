@@ -7,16 +7,20 @@ import '../models/post_model.dart';
 
 abstract class PostRemoteDatasource {
   Future<List<PostModel>> getPosts();
+
   Future<PostModel> createPost({
     required int userId,
+    required String username, // used in header
     required String fullName,
     required String content,
     List<String> mediaUrls,
   });
+
   Future<String> uploadMedia(String filePath);
+
   Future<void> likePost(String postId, int userId);
-  Future<void> commentPost(
-      String postId, int userId, String username, String text);
+
+  Future<void> commentPost(String postId, CommentModel comment);
 }
 
 class PostRemoteDatasourceImpl implements PostRemoteDatasource {
@@ -28,7 +32,9 @@ class PostRemoteDatasourceImpl implements PostRemoteDatasource {
     try {
       final resp = await _dio.get(ApiConstants.posts);
       final list = resp.data as List;
-      return list.map((e) => PostModel.fromJson(e as Map<String, dynamic>)).toList();
+      return list
+          .map((e) => PostModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } on DioException catch (e) {
       _handleError(e);
     }
@@ -37,17 +43,22 @@ class PostRemoteDatasourceImpl implements PostRemoteDatasource {
   @override
   Future<PostModel> createPost({
     required int userId,
+    required String username,
     required String fullName,
     required String content,
     List<String> mediaUrls = const [],
   }) async {
     try {
-      final resp = await _dio.post(ApiConstants.posts, data: {
-        'userId': userId,
-        'fullName': fullName,
-        'content': content,
-        'mediaUrls': mediaUrls,
-      });
+      final resp = await _dio.post(
+        ApiConstants.posts,
+        data: {
+          'userId': userId,
+          'fullName': fullName,
+          'content': content,
+          'mediaUrls': mediaUrls,
+        },
+        options: Options(headers: {'X-User-Name': username}),
+      );
       return PostModel.fromJson(resp.data as Map<String, dynamic>);
     } on DioException catch (e) {
       _handleError(e);
@@ -70,22 +81,16 @@ class PostRemoteDatasourceImpl implements PostRemoteDatasource {
   @override
   Future<void> likePost(String postId, int userId) async {
     try {
-      await _dio.post('${ApiConstants.posts}/$postId/like',
-          data: {'userId': userId});
+      await _dio.post('${ApiConstants.posts}/$postId/like', data: {'userId': userId});
     } on DioException catch (e) {
       _handleError(e);
     }
   }
 
   @override
-  Future<void> commentPost(
-      String postId, int userId, String username, String text) async {
+  Future<void> commentPost(String postId, CommentModel comment) async {
     try {
-      await _dio.post('${ApiConstants.posts}/$postId/comment', data: {
-        'userId': userId,
-        'username': username,
-        'text': text,
-      });
+      await _dio.post('${ApiConstants.posts}/$postId/comment', data: comment.toJson());
     } on DioException catch (e) {
       _handleError(e);
     }
@@ -93,6 +98,7 @@ class PostRemoteDatasourceImpl implements PostRemoteDatasource {
 
   Never _handleError(DioException e) {
     if (e.response?.statusCode == 401) throw const AuthException();
+    if (e.response?.statusCode == 403) throw const ForbiddenException();
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.unknown) {
       throw const NetworkException();

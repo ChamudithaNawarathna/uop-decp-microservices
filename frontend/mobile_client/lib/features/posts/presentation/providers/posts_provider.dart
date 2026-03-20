@@ -64,6 +64,7 @@ class PostsNotifier extends Notifier<PostsState> {
       final post = await datasource.createPost(
         userId: user.id,
         fullName: user.fullName,
+        username: user.username,
         content: content,
         mediaUrls: mediaUrls,
       );
@@ -110,10 +111,15 @@ class PostsNotifier extends Notifier<PostsState> {
     final user = ref.read(currentUserProvider);
     if (user == null) return false;
     try {
-      await ref
-          .read(postDatasourceProvider)
-          .commentPost(postId, user.id, user.username, text);
-      loadPosts();
+      final comment = CommentModel(
+        userId: user.id,
+        username: user.username,
+        text: text,
+        createdAt:
+            DateTime.now().toIso8601String(), // optional, frontend can prefill
+      );
+      await ref.read(postDatasourceProvider).commentPost(postId, comment);
+      await loadPosts(); // refresh posts to get updated comments
       return true;
     } catch (_) {
       return false;
