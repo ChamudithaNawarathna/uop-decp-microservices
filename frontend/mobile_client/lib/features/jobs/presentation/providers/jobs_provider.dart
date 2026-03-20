@@ -1,3 +1,4 @@
+import 'package:decp_mobile_app/features/jobs/data/models/job_application_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/job_remote_datasource.dart';
 import '../../data/models/job_model.dart';
@@ -73,15 +74,16 @@ class JobsNotifier extends Notifier<JobsState> {
       int jobId, String coverLetter, String resumeUrl) async {
     final user = ref.read(currentUserProvider);
     if (user == null) return false;
+
     try {
       await ref.read(jobDatasourceProvider).applyToJob(jobId, {
         'jobId': jobId,
         'userId': user.id,
         'applicantName': user.fullName,
-        'coverLetter': coverLetter,
+        'whyInterested': coverLetter,
         'resumeUrl': resumeUrl,
-        'status': 'PENDING',
       });
+
       return true;
     } catch (_) {
       return false;
