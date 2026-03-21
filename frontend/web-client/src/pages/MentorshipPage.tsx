@@ -26,8 +26,13 @@ export default function MentorshipPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>("discover");
 
+  const discoverLabel =
+    user?.role === "ALUMNI" || user?.role === "ADMIN"
+      ? "Find Mentees"
+      : "Find Mentors";
+
   const tabs: { key: Tab; label: string }[] = [
-    { key: "discover", label: "Find Mentors" },
+    { key: "discover", label: discoverLabel },
     { key: "requests", label: "Requests" },
     { key: "relationships", label: "My Mentorships" },
     { key: "my-profile", label: "My Profile" },
