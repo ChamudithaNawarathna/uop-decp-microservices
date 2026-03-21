@@ -2,7 +2,11 @@
 // Formats an ISO datetime string like '2026-03-06T14:30:00' into a relative time string (e.g. '2 hours ago')
 String timeAgo(String isoDateString) {
   try {
-    final date = DateTime.parse(isoDateString);
+    // Server sends LocalDateTime without timezone — treat as UTC
+    final normalized = (isoDateString.endsWith('Z') || isoDateString.contains('+'))
+        ? isoDateString
+        : '${isoDateString}Z';
+    final date = DateTime.parse(normalized).toLocal();
     final now = DateTime.now();
     final diff = now.difference(date);
 
@@ -20,7 +24,10 @@ String timeAgo(String isoDateString) {
 
 String formatDate(String isoDateString) {
   try {
-    final date = DateTime.parse(isoDateString);
+    final normalized = (isoDateString.endsWith('Z') || isoDateString.contains('+'))
+        ? isoDateString
+        : '${isoDateString}Z';
+    final date = DateTime.parse(normalized).toLocal();
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'

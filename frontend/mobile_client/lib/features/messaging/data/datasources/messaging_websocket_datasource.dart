@@ -160,6 +160,8 @@ class MessagingWebSocketDatasource {
         if (frame.body == null) return;
         try {
           final data = jsonDecode(frame.body!) as Map<String, dynamic>;
+          // Stamp with client UTC time — server LocalDateTime has no timezone info
+          data['createdAt'] = DateTime.now().toUtc().toIso8601String();
           onMessage(MessageModel.fromJson(data));
         } catch (_) {}
       },
