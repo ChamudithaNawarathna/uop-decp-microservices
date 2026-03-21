@@ -51,6 +51,17 @@ public class MentorshipCache {
         }
     }
 
+    public void invalidateAllMatches() {
+        try {
+            Set<String> keys = redisTemplate.keys(MATCHES_KEY + "*");
+            if (keys != null && !keys.isEmpty()) {
+                redisTemplate.delete(keys);
+            }
+        } catch (Exception e) {
+            log.warn("Redis invalidateAllMatches failed: {}", e.getMessage());
+        }
+    }
+
     public void cacheTopMentors(String topMentorsJson) {
         try {
             redisTemplate.opsForValue().set(TOP_MENTORS_KEY, topMentorsJson, TOP_MENTORS_TTL);

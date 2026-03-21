@@ -1,5 +1,6 @@
 package com.decp.mentorship.service;
 
+import com.decp.mentorship.cache.MentorshipCache;
 import com.decp.mentorship.dto.MentorshipProfileRequest;
 import com.decp.mentorship.dto.MentorshipProfileResponse;
 import com.decp.mentorship.model.MentorshipProfile;
@@ -17,6 +18,7 @@ import java.util.List;
 public class MentorshipProfileService {
 
     private final MentorshipProfileRepository profileRepository;
+    private final MentorshipCache mentorshipCache;
 
     @Transactional
     public MentorshipProfileResponse createOrUpdateProfile(Long userId, String userName, String userRole,
@@ -43,6 +45,7 @@ public class MentorshipProfileService {
         profile.setLinkedInUrl(request.getLinkedInUrl());
 
         MentorshipProfile saved = profileRepository.save(profile);
+        mentorshipCache.invalidateAllMatches();
         return toResponse(saved);
     }
 
