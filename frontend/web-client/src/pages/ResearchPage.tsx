@@ -20,6 +20,26 @@ const CATEGORIES: ResearchCategory[] = [
   "WORKSHOP",
 ];
 
+const RESEARCH_TAGS = [
+  "ALGORITHMS",
+  "BLOCKCHAIN",
+  "BIOINFORMATICS",
+  "CLOUD_COMPUTING",
+  "COMPUTER_VISION",
+  "CYBERSECURITY",
+  "DATA_SCIENCE",
+  "DATABASES",
+  "DEEP_LEARNING",
+  "IOT",
+  "MACHINE_LEARNING",
+  "MOBILE_DEVELOPMENT",
+  "NLP",
+  "QUANTUM_COMPUTING",
+  "SYSTEMS_PROGRAMMING",
+  "WEB_DEVELOPMENT",
+  "OTHER",
+] as const;
+
 export default function ResearchPage() {
   const { user } = useAuth();
   const [papers, setPapers] = useState<ResearchResponse[]>([]);
@@ -215,7 +235,7 @@ function CreatePaperModal({
   const [title, setTitle] = useState("");
   const [researchAbstract, setResearchAbstract] = useState("");
   const [category, setCategory] = useState<ResearchCategory>("PAPER");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [authors, setAuthors] = useState("");
   const [documentUrl, setDocumentUrl] = useState("");
   const [doi, setDoi] = useState("");
@@ -231,10 +251,7 @@ function CreatePaperModal({
         title: title.trim(),
         researchAbstract: researchAbstract.trim(),
         category,
-        tags: tags
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
+        tags,
         authors: authors
           .split(",")
           .map((a) => a.trim())
@@ -303,13 +320,29 @@ function CreatePaperModal({
               ))}
             </select>
           </div>
-          <input
-            type="text"
-            placeholder="Tags (e.g. AI, Blockchain, Machine Learning)"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="w-full rounded-xl border subtle-border bg-white/80 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-400/40 dark:bg-white/5"
-          />
+          <div>
+            <p className="mb-1.5 text-xs font-semibold ink-muted">Tags (select all that apply)</p>
+            <div className="flex flex-wrap gap-2">
+              {RESEARCH_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() =>
+                    setTags((prev) =>
+                      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+                    )
+                  }
+                  className={`rounded-lg border px-3 py-1 text-xs font-semibold transition ${
+                    tags.includes(tag)
+                      ? "border-primary-500 bg-primary-500/15 text-primary-700 dark:bg-primary-500/30 dark:text-primary-200"
+                      : "subtle-border bg-white/80 ink-muted hover:border-primary-400 dark:bg-white/5"
+                  }`}
+                >
+                  {tag.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+          </div>
           <input
             type="url"
             placeholder="Document URL (PDF link)"
