@@ -837,12 +837,13 @@ function MyProfileTab() {
   }, [user]);
 
   const save = async () => {
+    if (saving) return;
     try {
       setSaving(true);
       await mentorshipService.createProfile(form);
+      setEditing(false);
       const res = await mentorshipService.getMyProfile();
       setProfile(res.data);
-      setEditing(false);
     } catch {
       /* ignore */
     } finally {
