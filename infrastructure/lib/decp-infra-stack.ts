@@ -167,6 +167,8 @@ export class DecpInfraStack extends cdk.Stack {
         blockPublicPolicy: false,
         restrictPublicBuckets: false,
       }),
+      websiteIndexDocument: 'index.html',
+      websiteErrorDocument: 'index.html',
       cors: [{
         allowedMethods: [s3.HttpMethods.GET],
         allowedOrigins: ['*'],
@@ -252,6 +254,11 @@ export class DecpInfraStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'MediaBucketName', {
       value: this.mediaBucket.bucketName,
       description: 'S3 bucket for post media — set as S3_BUCKET_NAME env var in post-service',
+    });
+
+    new cdk.CfnOutput(this, 'FrontendUrl', {
+      value: this.mediaBucket.bucketWebsiteUrl,
+      description: 'Frontend website URL — set as CORS_ALLOWED_ORIGIN in GitHub secrets',
     });
   }
 }
