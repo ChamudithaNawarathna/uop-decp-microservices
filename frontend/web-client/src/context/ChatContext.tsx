@@ -116,7 +116,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       const msgSub = client.subscribe(
         `/topic/messages/${conv.id}`,
         (frame) => {
-          const msg: MessageResponse = JSON.parse(frame.body);
+          const raw = JSON.parse(frame.body);
+          // Stamp with client time — server LocalDateTime has no timezone info
+          const msg: MessageResponse = { ...raw, createdAt: new Date().toISOString() };
 
           // If this message belongs to the currently active conversation
           if (currentConversationIdRef.current === conv.id) {
